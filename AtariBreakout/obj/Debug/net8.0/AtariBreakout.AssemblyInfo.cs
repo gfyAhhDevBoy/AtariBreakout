@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AtariBreakout")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e8fa65da8364de824d4d5c012876d9022a6321a")]
 [assembly: System.Reflection.AssemblyProductAttribute("AtariBreakout")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AtariBreakout")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

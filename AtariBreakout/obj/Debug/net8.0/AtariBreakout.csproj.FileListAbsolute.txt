@@ -25,3 +25,4 @@ C:\Users\ilyan\Documents\C#\20GameChallenge\AtariBreakout\AtariBreakout\obj\Debu
 C:\Users\ilyan\Documents\C#\20GameChallenge\AtariBreakout\AtariBreakout\obj\Debug\net8.0\ref\AtariBreakout.dll
 C:\Users\ilyan\Documents\C#\20GameChallenge\AtariBreakout\AtariBreakout\bin\Debug\net8.0\Content\Score.xnb
 C:\Users\ilyan\Documents\C#\20GameChallenge\AtariBreakout\AtariBreakout\bin\Debug\net8.0\Content\heart.xnb
+C:\Users\ilyan\Documents\C#\20GameChallenge\AtariBreakout\AtariBreakout\obj\Debug\net8.0\AtariBreakout.sourcelink.json

@@ -6,7 +6,7 @@ namespace AtariBreakout;
 class Block
 {
     public static readonly int Width = 75;
-    public static readonly int Height = 20;
+    public static readonly int Height = 30;
     public Vector2 Position;
     public Texture2D texture;
     public Rectangle Rect

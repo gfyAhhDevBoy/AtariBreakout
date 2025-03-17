@@ -11,7 +11,9 @@ namespace AtariBreakout;
 class Ball
 {
     private Vector2 position;
+    private Vector2 originalPosition;
     private Vector2 movement;
+    private float originalSpeed;
     private Texture2D texture;
     private int width, height;
     Paddle paddle;
@@ -34,10 +36,12 @@ class Ball
     public Ball(Vector2 pos, float speed, int width, int height, Paddle paddle, GraphicsDevice graphicsDevice, List<List<Block>> blocks)
     {
         position = pos;
+        originalPosition = pos;
         this.width = width;
         this.height = height;
         this.paddle = paddle;
         movement.Y = -speed;
+        originalSpeed = speed;
         this.blocks = new();
         this.blocks = blocks;
         started = false;
@@ -84,7 +88,8 @@ class Ball
             }
             if (position.Y > Game1.SCREEN_HEIGHT)
             {
-                // Respawn ball / loose
+                Reset();
+                Game1.Lives--;
             }
 
             if (Rect.Intersects(paddle.Rect))
@@ -100,7 +105,7 @@ class Ball
                 {
                     if (Rect.Intersects(block.Rect))
                     {
-                        movement.Y *= -1.1f;
+                        movement.Y *= -1.05f;
                         killList.Add(block);
                         Game1.Score++;
                     }
@@ -118,11 +123,31 @@ class Ball
                 }
             }
         }
+        else
+        {
+            position.X = paddle.Position.X;
+        }
 
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(texture, Rect, Color.White);
+    }
+
+    public void Reset()
+    {
+        started = false;
+        int rand = random.Next(1, 11);
+        if (rand <= 5)
+        {
+            movement.X = -originalSpeed;
+        }
+        else
+        {
+            movement.X = originalSpeed;
+        }
+        movement.Y = -originalSpeed;
+        position = originalPosition;
     }
 }
