@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>c:/Users/ilyan/Documents/C#/20GameChallenge/AtariBreakout/AtariBreakout/Content/Score.spritefont</SourceFile>
+  <SourceTime>2025-03-16T13:54:56.0430182+01:00</SourceTime>
+  <DestFile>c:/Users/ilyan/Documents/C#/20GameChallenge/AtariBreakout/AtariBreakout/Content/bin/DesktopGL/Score.xnb</DestFile>
+  <DestTime>2025-03-17T19:53:53.7056716+01:00</DestTime>
+  <Importer>FontDescriptionImporter</Importer>
+  <ImporterTime>2024-08-16T19:05:56+02:00</ImporterTime>
+  <Processor>FontDescriptionProcessor</Processor>
+  <ProcessorTime>2024-08-16T19:05:56+02:00</ProcessorTime>
+  <Parameters>
+    <Key>PremultiplyAlpha</Key>
+    <Value>True</Value>
+  </Parameters>
+  <Parameters>
+    <Key>TextureFormat</Key>
+    <Value>Compressed</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>
