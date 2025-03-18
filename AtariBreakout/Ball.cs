@@ -1,8 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using Microsoft.Xna.Framework.Input;
 using System;
 
@@ -66,7 +64,11 @@ class Ball
     public void Update(GameTime gameTime)
     {
         if (!started && Keyboard.GetState().IsKeyDown(Keys.Space) && !prevkb.IsKeyDown(Keys.Space))
+        {
             started = true;
+            movement = -Vector2.UnitY * originalSpeed;
+        }
+
 
         if (started)
         {

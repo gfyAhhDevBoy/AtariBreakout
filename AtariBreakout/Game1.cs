@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -27,7 +27,7 @@ public class Game1 : Game
     Ball ball;
     SpriteFont scoreFont, menuFont, titleFont;
 
-    public static int Score, Lives, Highscore;
+    public static int Score, Lives;
 
     GameState gameState;
 
@@ -36,9 +36,14 @@ public class Game1 : Game
 
     Texture2D heart;
 
-    List<Button> mainMenuButtons, gameOverButtons;
+    List<Button> mainMenuButtons, gameOverButtons, pausedButtons;
     Button playButton, replayButton;
     Button exitButton;
+    Button resumeButton;
+
+    KeyboardState prevKbState;
+
+    string hsFile = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\hs.bin";
 
     public Game1()
     {
@@ -58,6 +63,7 @@ public class Game1 : Game
         gameState = GameState.MainMenu;
         mainMenuButtons = new();
         gameOverButtons = new();
+        pausedButtons = new();
 
         Score = 0;
         Lives = 3;
@@ -87,14 +93,13 @@ public class Game1 : Game
             }
             for (int j = 0; j < 8; j++)
             {
-
-
                 blocks[i].Add(new Block(new Vector2(j * Block.Width * 1.1f, i * Block.Height * 1.25f), _graphics.GraphicsDevice, color));
             }
         }
 
         paddle = new(new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 150), 15, 150, _graphics.GraphicsDevice);
         ball = new(new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 170), 450f, 10, 10, paddle, _graphics.GraphicsDevice, blocks);
+
         base.Initialize();
     }
 
@@ -109,26 +114,29 @@ public class Game1 : Game
 
         playButton = new Button("Play", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75), menuFont, Color.White, Color.Gray);
         replayButton = new Button("Replay", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75), menuFont, Color.White, Color.Gray);
+        resumeButton = new Button("Resume", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75), menuFont, Color.White, Color.Gray);
         exitButton = new Button("Exit", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 150), menuFont, Color.White, Color.IndianRed);
 
         mainMenuButtons.Add(playButton);
         mainMenuButtons.Add(exitButton);
         gameOverButtons.Add(exitButton);
         gameOverButtons.Add(replayButton);
+        pausedButtons.Add(exitButton);
+        pausedButtons.Add(resumeButton);
 
         exitButton.OnClickEvent += ExitButton;
         playButton.OnClickEvent += PlayButton;
-        replayButton.OnClickEvent += PlayButton;
+        replayButton.OnClickEvent += ReplayButton;
+        resumeButton.OnClickEvent += PlayButton;
 
-
+        prevKbState = Keyboard.GetState();
 
         // TODO: use this.Content to load your game content here
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
+        KeyboardState kb = Keyboard.GetState();
 
         switch (gameState)
         {
@@ -150,8 +158,18 @@ public class Game1 : Game
                 }
                 if (Lives <= 0)
                     gameState = GameState.GameOver;
+
+                if (kb.IsKeyDown(Keys.Escape) && !prevKbState.IsKeyDown(Keys.Escape))
+                {
+                    gameState = GameState.Pause;
+                }
+
                 break;
             case GameState.Pause:
+                foreach (var button in pausedButtons)
+                {
+                    button.Update();
+                }
                 break;
             case GameState.GameOver:
                 foreach (var button in gameOverButtons)
@@ -160,6 +178,8 @@ public class Game1 : Game
                 }
                 break;
         }
+
+        prevKbState = kb;
 
         // TODO: Add your update logic here
 
@@ -197,6 +217,11 @@ public class Game1 : Game
                 _spriteBatch.DrawString(scoreFont, Lives.ToString(), new Vector2(SCREEN_WIDTH - scoreFont.MeasureString(Lives.ToString()).Y, SCREEN_HEIGHT - scoreFont.MeasureString(Score.ToString()).Y), Color.White);
                 break;
             case GameState.Pause:
+                foreach (var button in pausedButtons)
+                {
+                    button.Draw(_spriteBatch);
+                }
+                _spriteBatch.DrawString(titleFont, "PAUSED", new Vector2(SCREEN_WIDTH / 2 - titleFont.MeasureString("PAUSED").X / 2, SCREEN_HEIGHT / 2 - titleFont.MeasureString("PAUSED").Y / 2 - 100), Color.White);
                 break;
             case GameState.GameOver:
                 foreach (var button in gameOverButtons)
@@ -216,11 +241,20 @@ public class Game1 : Game
 
     void ExitButton(object sender, EventArgs e)
     {
-        Environment.Exit(0);
+        Exit();
     }
 
     void PlayButton(object sender, EventArgs e)
     {
+        gameState = GameState.Playing;
+    }
+
+    void ReplayButton(object sender, EventArgs e)
+    {
+        Score = 0;
+        Lives = 3;
+        paddle = new(new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 150), 15, 150, _graphics.GraphicsDevice);
+        ball = new(new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 170), 450f, 10, 10, paddle, _graphics.GraphicsDevice, blocks);
         gameState = GameState.Playing;
     }
 }

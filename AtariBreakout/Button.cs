@@ -66,6 +66,6 @@ class Button
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.DrawString(font, Text, new Vector2(Position.X - font.MeasureString("Text").X / 2, Position.Y - font.MeasureString("Text").Y / 2), hovered ? hoverColor : color);
+        spriteBatch.DrawString(font, Text, new Vector2(Rect.X, Rect.Y), hovered ? hoverColor : color);
     }
 }
