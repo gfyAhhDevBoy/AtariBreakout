@@ -1,11 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection.Metadata;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace AtariBreakout;
+
+enum GameState
+{
+    MainMenu,
+    Playing,
+    Pause,
+    GameOver
+}
 
 public class Game1 : Game
 {
@@ -17,16 +25,20 @@ public class Game1 : Game
 
     Paddle paddle;
     Ball ball;
-    SpriteFont font;
+    SpriteFont scoreFont, menuFont, titleFont;
 
     public static int Score, Lives, Highscore;
 
+    GameState gameState;
 
     //List<Block> blocks;
     List<List<Block>> blocks;
 
     Texture2D heart;
-    bool gameOver;
+
+    List<Button> mainMenuButtons, gameOverButtons;
+    Button playButton, replayButton;
+    Button exitButton;
 
     public Game1()
     {
@@ -43,9 +55,12 @@ public class Game1 : Game
         _graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
         _graphics.ApplyChanges();
 
+        gameState = GameState.MainMenu;
+        mainMenuButtons = new();
+        gameOverButtons = new();
+
         Score = 0;
         Lives = 3;
-        gameOver = false;
 
         blocks = [new List<Block>(), new List<Block>(), new List<Block>(), new List<Block>()];
 
@@ -80,9 +95,6 @@ public class Game1 : Game
 
         paddle = new(new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 150), 15, 150, _graphics.GraphicsDevice);
         ball = new(new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 170), 450f, 10, 10, paddle, _graphics.GraphicsDevice, blocks);
-
-
-
         base.Initialize();
     }
 
@@ -90,8 +102,25 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        font = Content.Load<SpriteFont>("Score");
+        scoreFont = Content.Load<SpriteFont>("Score");
+        menuFont = Content.Load<SpriteFont>("MenuText");
+        titleFont = Content.Load<SpriteFont>("Title");
         heart = Content.Load<Texture2D>("heart");
+
+        playButton = new Button("Play", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75), menuFont, Color.White, Color.Gray);
+        replayButton = new Button("Replay", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75), menuFont, Color.White, Color.Gray);
+        exitButton = new Button("Exit", new Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 150), menuFont, Color.White, Color.IndianRed);
+
+        mainMenuButtons.Add(playButton);
+        mainMenuButtons.Add(exitButton);
+        gameOverButtons.Add(exitButton);
+        gameOverButtons.Add(replayButton);
+
+        exitButton.OnClickEvent += ExitButton;
+        playButton.OnClickEvent += PlayButton;
+        replayButton.OnClickEvent += PlayButton;
+
+
 
         // TODO: use this.Content to load your game content here
     }
@@ -101,24 +130,35 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        if (!gameOver)
+        switch (gameState)
         {
-            paddle.Update(gameTime);
-            ball.Update(gameTime);
-
-            foreach (var list in blocks)
-            {
-                foreach (var block in list)
+            case GameState.MainMenu:
+                foreach (var button in mainMenuButtons)
                 {
-                    block.Update(gameTime);
-
+                    button.Update();
                 }
-            }
-        }
-
-        if (Lives <= 0)
-        {
-            gameOver = true;
+                break;
+            case GameState.Playing:
+                paddle.Update(gameTime);
+                ball.Update(gameTime);
+                foreach (var list in blocks)
+                {
+                    foreach (var block in list)
+                    {
+                        block.Update(gameTime);
+                    }
+                }
+                if (Lives <= 0)
+                    gameState = GameState.GameOver;
+                break;
+            case GameState.Pause:
+                break;
+            case GameState.GameOver:
+                foreach (var button in gameOverButtons)
+                {
+                    button.Update();
+                }
+                break;
         }
 
         // TODO: Add your update logic here
@@ -134,31 +174,53 @@ public class Game1 : Game
 
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
-        foreach (var list in blocks)
+        switch (gameState)
         {
-            foreach (var block in list)
-            {
-                block.Draw(_spriteBatch);
-            }
+            case GameState.MainMenu:
+                foreach (var button in mainMenuButtons)
+                {
+                    button.Draw(_spriteBatch);
+                }
+                _spriteBatch.DrawString(titleFont, "BREAKOUT!", new Vector2(SCREEN_WIDTH / 2 - titleFont.MeasureString("BREAKOUT").X / 2, SCREEN_HEIGHT / 2 - titleFont.MeasureString("BREAKOUT").Y / 2 - 100), Color.White);
+                break;
+            case GameState.Playing:
+                foreach (var list in blocks)
+                {
+                    foreach (var block in list)
+                    {
+                        block.Draw(_spriteBatch);
+                    }
+                }
+                ball.Draw(_spriteBatch);
+                paddle.Draw(_spriteBatch);
+                _spriteBatch.DrawString(scoreFont, Score.ToString(), new Vector2(5, SCREEN_HEIGHT - scoreFont.MeasureString(Score.ToString()).Y), Color.White);
+                _spriteBatch.DrawString(scoreFont, Lives.ToString(), new Vector2(SCREEN_WIDTH - scoreFont.MeasureString(Lives.ToString()).Y, SCREEN_HEIGHT - scoreFont.MeasureString(Score.ToString()).Y), Color.White);
+                break;
+            case GameState.Pause:
+                break;
+            case GameState.GameOver:
+                foreach (var button in gameOverButtons)
+                {
+                    button.Draw(_spriteBatch);
+                }
+                _spriteBatch.DrawString(titleFont, "Game Over!", new Vector2(SCREEN_WIDTH / 2 - titleFont.MeasureString("Game Over").X / 2, (SCREEN_HEIGHT / 2) - 100 - titleFont.MeasureString("Game Over").Y / 2), Color.IndianRed);
+                break;
         }
 
-        ball.Draw(_spriteBatch);
-        paddle.Draw(_spriteBatch);
 
-        for (int i = 0; i < Lives; i++)
-        {
-            //_spriteBatch.Draw(heart, new Rectangle(SCREEN_WIDTH - heart.Width - i * heart.Width + 15, SCREEN_HEIGHT - heart.Height, (int)(heart.Width * 0.25f), (int)(heart.Height * 0.25f)), Color.White);
-            //_spriteBatch.Draw(heart, new Vector2(SCREEN_WIDTH - heart.Width - i * heart.Width + 15, SCREEN_HEIGHT - heart.Height), new Rectangle(), Color.White, 0f, Vector2.Zero, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0f);
-        }
-
-        _spriteBatch.DrawString(font, Score.ToString(), new Vector2(5, SCREEN_HEIGHT - font.MeasureString(Score.ToString()).Y), Color.White);
-        _spriteBatch.DrawString(font, Lives.ToString(), new Vector2(SCREEN_WIDTH - font.MeasureString(Lives.ToString()).Y, SCREEN_HEIGHT - font.MeasureString(Score.ToString()).Y), Color.White);
-
-        if (gameOver)
-            _spriteBatch.DrawString(font, "Game Over!", new Vector2(SCREEN_WIDTH / 2 - font.MeasureString("Game Over!").X / 2, SCREEN_HEIGHT / 2 - font.MeasureString("Game Over!").Y / 2), Color.IndianRed);
 
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    void ExitButton(object sender, EventArgs e)
+    {
+        Environment.Exit(0);
+    }
+
+    void PlayButton(object sender, EventArgs e)
+    {
+        gameState = GameState.Playing;
     }
 }

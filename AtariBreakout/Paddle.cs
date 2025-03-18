@@ -23,7 +23,7 @@ class Paddle
         Width = width;
 
         Texture = new Texture2D(graphicsDevice, 1, 1);
-        Texture.SetData([Color.White]);
+        Texture.SetData([Color.CornflowerBlue]);
     }
 
     public void Update(GameTime gameTime)
