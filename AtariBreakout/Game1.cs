@@ -93,6 +93,7 @@ public class Game1 : Game
             }
             for (int j = 0; j < 8; j++)
             {
+
                 blocks[i].Add(new Block(new Vector2(j * Block.Width * 1.1f, i * Block.Height * 1.25f), _graphics.GraphicsDevice, color));
             }
         }

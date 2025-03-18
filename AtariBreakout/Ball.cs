@@ -107,7 +107,7 @@ class Ball
                 {
                     if (Rect.Intersects(block.Rect))
                     {
-                        movement.Y *= -1.05f;
+                        movement.Y *= -1.02f;
                         killList.Add(block);
                         Game1.Score++;
                     }
