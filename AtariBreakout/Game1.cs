@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Dynamic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -18,7 +19,7 @@ public class Game1 : Game
     Ball ball;
     SpriteFont font;
 
-    public static int Score, Lives;
+    public static int Score, Lives, Highscore;
 
 
     //List<Block> blocks;
@@ -152,6 +153,9 @@ public class Game1 : Game
 
         _spriteBatch.DrawString(font, Score.ToString(), new Vector2(5, SCREEN_HEIGHT - font.MeasureString(Score.ToString()).Y), Color.White);
         _spriteBatch.DrawString(font, Lives.ToString(), new Vector2(SCREEN_WIDTH - font.MeasureString(Lives.ToString()).Y, SCREEN_HEIGHT - font.MeasureString(Score.ToString()).Y), Color.White);
+
+        if (gameOver)
+            _spriteBatch.DrawString(font, "Game Over!", new Vector2(SCREEN_WIDTH / 2 - font.MeasureString("Game Over!").X / 2, SCREEN_HEIGHT / 2 - font.MeasureString("Game Over!").Y / 2), Color.IndianRed);
 
         _spriteBatch.End();
 
